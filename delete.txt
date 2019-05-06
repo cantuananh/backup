@@ -1,0 +1,27 @@
+#!/bin/bash
+# khai bao (declare) de hieu dau cham than
+# Turn on the extended pattern matching features
+shopt -s extglob
+# xoa toan bo file ngoai tru 2 file
+# delete all file except some file
+rm -rf !(delete.sh|idol.txt)
+# ngau nhien trong 20 so
+# ramdom numbers between 1 - 20
+random_id_image=$((RANDOM%20+1))
+# lay ra thu tu ngay hom nay trong tuan
+# 
+DayOfWeek=$(date +"%u")
+echo $DayOfWeek
+for ((i=1;i<=7; i++))
+do
+	# lay ra khoang cach cac ngay trong tuan vs ngay hom nay 
+	Distance=`expr "$i" - "$DayOfWeek"`
+	# lay ra cac ngay trong tuan
+	GetDay=$(date -d "$Distance day" +%d_%m_%Y)
+	# doc tung dong trong file idol theo vong lap
+	GetKeyWord=$(sed -n $i'p' < idol.txt)
+	# lay ra duong link anh
+	GetImageLink=$(wget --user-agent 'Mozilla/5.0' -qO - "https://www.google.com/search?q=$GetKeyWord\&tbm=isch" | sed 's/</\n</g' | grep '<img'| tail -"$random_id_image"| head -1 | sed 's/.*src="\([^"]*\)".*/\1/') 
+mkdir $GetDay
+wget "$GetImageLink" -O "$GetDay/$GetKeyWord.jpg"
+done
